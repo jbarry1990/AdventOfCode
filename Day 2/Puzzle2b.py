@@ -1,5 +1,5 @@
 """
-Puzzle #2a - AdventOfCode
+Puzzle #2b - AdventOfCode
 Read in a list of passwords
 Parse the string for the rule and the associated password
 Determine whether the password meets the rule
@@ -20,25 +20,24 @@ def ParseEntry(Entry):
     DashIndex = Entry.find("-")
     FirstSpaceIndex = Entry.find(" ")
     ColonIndex = Entry.find(":")
-    LowerLimit = Entry[0:DashIndex]
-    UpperLimit = Entry[DashIndex+1:FirstSpaceIndex]
+    FirstIndex = int(Entry[0:DashIndex])-1
+    SecondIndex = int(Entry[DashIndex+1:FirstSpaceIndex])-1
     ImportantCharacter = Entry[FirstSpaceIndex+1]
     StringToSearch = Entry[ColonIndex+2:]
         
-    return LowerLimit, UpperLimit, ImportantCharacter, StringToSearch
+    return FirstIndex, SecondIndex, ImportantCharacter, StringToSearch
 
-def ValidateEntry(LowerLimit,
-                  UpperLimit,
+def ValidateEntry(FirstIndex,
+                  SecondIndex,
                   ImportantCharacter,
                   StringToSearch):
-    CharacterCounter = 0
-    for Characters in StringToSearch:
-        if Characters == ImportantCharacter:
-            CharacterCounter +=1
-    if CharacterCounter < int(LowerLimit) or CharacterCounter > int(UpperLimit):
-        return False
-    else:
+
+    IsFirstNotSecond = StringToSearch[FirstIndex] == ImportantCharacter and StringToSearch[SecondIndex] != ImportantCharacter
+    IsSecondNotFirst = StringToSearch[FirstIndex] != ImportantCharacter and StringToSearch[SecondIndex] == ImportantCharacter
+    if IsFirstNotSecond ^ IsSecondNotFirst:
         return True
+    else:
+        return False
 
 def main():
     NumberOfValidPasswords = 0
@@ -46,10 +45,10 @@ def main():
     PasswordList = ReadInFile()
 
     for Entry in PasswordList:
-        LowerLimit,UpperLimit,ImportantCharacter,StringToSearch = ParseEntry(Entry)
+        FirstIndex,SecondIndex,ImportantCharacter,StringToSearch = ParseEntry(Entry)
         
-        IsValid = ValidateEntry(LowerLimit,
-                                UpperLimit,
+        IsValid = ValidateEntry(FirstIndex,
+                                SecondIndex,
                                 ImportantCharacter,
                                 StringToSearch)
 
