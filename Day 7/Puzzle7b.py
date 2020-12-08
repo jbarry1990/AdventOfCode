@@ -60,6 +60,9 @@ def Calculate(RelevantRules, DesiredBag):
             print("DesiredBag: ", DesiredBag)
             print("NextBag: ", SubBag)
             print("Answer: ", Answer)
+    else:
+        Answer = 1
+
     return Answer
             
             
