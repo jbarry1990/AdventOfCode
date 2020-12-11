@@ -24,25 +24,26 @@ def SortReadings(JoltReadings):
 
     return JoltReadings
 
-def CalculateCombinations(SortedReadings):
+def DetermineJoltageDifference(SortedReadings):
+    OnesCount = 0
+    ThreesCount = 0
+    LastIndex = len(SortedReadings)-1
 
-    Path = [1]
-    NumberOfAdapters = len(SortedReadings)
+    for Index, Adapter in enumerate(SortedReadings):
+        if Index == LastIndex:
+            continue
+        if SortedReadings[Index+1] - Adapter == 1:
+            OnesCount += 1
+        elif SortedReadings[Index+1] - Adapter == 3:
+            ThreesCount += 1
 
-    for EndOfChain in range(1, NumberOfAdapters):
-        Answer = 0
-        for ElementsInPath in range(EndOfChain):
-            if SortedReadings[ElementsInPath] + 3 >= SortedReadings[EndOfChain]:
-                Answer += Path[ElementsInPath]
-        Path.append(Answer)
-
-    return Path[-1]       
+    return OnesCount, ThreesCount
         
 def main():
     JoltReadings = ReadInFile()
     SortedReadings = SortReadings(JoltReadings)
-    Answer = CalculateCombinations(SortedReadings)
-    print("Part 2: ", Answer)
+    OnesCount, ThreesCount = DetermineJoltageDifference(SortedReadings)
+    print("Part 1: ", OnesCount*ThreesCount)
 
 
 if __name__ == "__main__":
