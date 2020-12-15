@@ -1,7 +1,13 @@
 """
-Puzzle #14a - AdventOfCode
+Puzzle #14b - AdventOfCode
 Read in a mask and data value pairs for that mask. This will repeat for many entries
-Using the mask manipulate the values and store them in the given memory addresses.
+Using the mask manipulate the addresses replacing the corresponding bits with the mask bits
+using the following rules:
+mask bit : 1 replace corresponding memory bit with a 1
+mask bit : 0 corresponding memory bit is unchanged
+mask bit : X correspoinding memory bit replaced with an X
+Each X can contain a 0 or a 1. Find all combinations for these "floating" bits
+Store the values in the updated memory locations
 Sum the data in all the memory locations
 Output the result
 """
