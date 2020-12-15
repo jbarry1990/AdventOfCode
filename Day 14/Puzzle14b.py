@@ -5,13 +5,14 @@ Using the mask manipulate the values and store them in the given memory addresse
 Sum the data in all the memory locations
 Output the result
 """
-
+from time import time
 def ReadInFile():
     File = open("./PuzzleInput.txt", "r")
     BitMaskData = []
     BitMaskSpecific =[]
-
+    Count = 0
     for Index,Entry in enumerate(File):
+        Count +=1
         if Index == 0:
             BitMaskSpecific.append(Entry.strip())
         else:
@@ -22,16 +23,11 @@ def ReadInFile():
                 
             else:
                 BitMaskSpecific.append(Entry.strip())
-        BitMaskData.append(BitMaskSpecific)
-              
+    BitMaskData.append(BitMaskSpecific)
+
     return BitMaskData
 
 def DetermineMasks(Mask):
-    #1. Store Location of X's in Mask in a list
-    #2. Determine how many X's there are
-    #3. Generate all possible combinations in binary
-    #4. Apply all possible variations to the given Mask adding each new Mask to a list
-    #5. Return list
     Masks =[]
     Locations = []
 
@@ -48,55 +44,55 @@ def DetermineMasks(Mask):
         
     NewMask = list(Mask)
     for Variation in Variations:
-        print("Variation: ", Variation)
-        Index = 0
-        for Number in Variation:
-            for MaskIndex, Bit in enumerate(Mask):
-                if MaskIndex == Locations[Index]:
-                    NewMask[MaskIndex] = Number
-            Index+=1
-            
-                
+        for Index, Location in enumerate(Locations):
+            NewMask[Location] = Variation[Index]
+        Masks.append("".join(NewMask))
+ 
     return Masks
+
 def RunInitialization(BitMaskData):
-    Memory={}
+    Memory = {}
     for BitMask in BitMaskData:
         Mask = ""
         MemoryAddress = 0
         MemoryValue = 0
-        NewMemoryValue = ""
+        NewMemoryAddress = ""
         for Index, Data in enumerate(BitMask):
             if Index == 0:
                 Mask = Data[7:]
             else:
-                MemoryAddress = Data[4:Data.find("]")]
+                MemoryAddress = int(Data[4:Data.find("]")])
+                MemoryAddress = format(MemoryAddress, "036b")
                 MemoryValue = int(Data[Data.find("=")+2:])
-                MemoryValue = format(MemoryValue, "036b")
+                for Index,Bit in enumerate(Mask):
+                    if Bit == "1":
+                        NewMemoryAddress += "1"
+                    elif Bit == "0":
+                        NewMemoryAddress += MemoryAddress[Index]
+                    elif Bit == "X":
+                        NewMemoryAddress += "X"
 
-                for Index,Bit in enumerate(MemoryValue):
-                    if Mask[Index] != "X":
-                        NewMemoryValue += Mask[Index]
-                    else:
-                        NewMemoryValue += MemoryValue[Index]
-                    Memory[MemoryAddress] = int(NewMemoryValue,2)
+                Masks = DetermineMasks(NewMemoryAddress)
+                for Iteration in Masks:
+                    Memory[int(Iteration,2)] = MemoryValue    
+                NewMemoryAddress = ""
 
-            NewMemoryValue = ""
     return Memory
 
-def SumMemoryValues(Memory):
-    Result = 0
-    for Key in Memory:
-        Result += Memory[Key]
-        
-    return Result
+def SumMemoryValues(Memory):        
+    return sum(Memory.values())
 
 def main():
-    BitMaskData = ReadInFile()
-    DetermineMasks("1001X0XX")
-    #Memory = RunInitialization(BitMaskData)
-    Answer = 0
+    t_start = time()
     
-    print("Part 1: ", Answer)
-
+    BitMaskData = ReadInFile()
+    Memory = RunInitialization(BitMaskData)
+    Answer = SumMemoryValues(Memory)
+    
+    print("Part 2: ", Answer)
+    
+    elapsed = 1000 * (time() - t_start)
+    print("Time: %.3fms" % elapsed)
+    
 if __name__ == "__main__":
     main()
