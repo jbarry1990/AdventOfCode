@@ -57,9 +57,6 @@ def Calculate(RelevantRules, DesiredBag):
             Count = int(Values[0])
             SubBag = Values[2:]
             Answer += Count * Calculate(RelevantRules, SubBag)
-            print("DesiredBag: ", DesiredBag)
-            print("NextBag: ", SubBag)
-            print("Answer: ", Answer)
     else:
         Answer = 1
 
