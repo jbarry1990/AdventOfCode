@@ -6,248 +6,129 @@ Puzzle #20a - AdventOfCode
 5. Output the result
 """
   
-from time import time
+from collections import *
+from functools import lru_cache
+import re
+import heapq
+import itertools
+import math
+import random
+import sys
 
-def ReadInFile():
-    ImageFragments = {}
-    Line = []
-    Fragment = []
-    
-    File = open("./PuzzleInput.txt", "r")
-    Key = ""
-    for Entry in File:
-        if Entry.strip().startswith("Tile"):
-            Key = Entry[5:-2]
-            continue
-        if Entry == "\n":
-            ImageFragments[Key] = Fragment
-            Fragment = []
-            continue
-        else:
-            for Character in Entry.strip():
-                Line.append(Character)
-            Fragment.append(Line)
-            Line = []
+def rot(g):
+    g = list(list(r) for r in g)
+    n = len(g)
+    assert(n == len(g[0]))
+    out = [[None for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            out[i][j] = g[n - j - 1][i]
 
-        ImageFragments[Key] = Fragment
-                
-    return ImageFragments
+    return tuple(''.join(row) for row in out)
 
-def DetermineBorders(ImageFragments):
-    Borders = {}
+def flip(g):
+    g = list(list(r) for r in g)
+    n = len(g)
+    assert(n == len(g[0]))
+    out = [[None for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        for j in range(n):
+            out[i][j] = g[j][i]
 
-    ImageLength = len(ImageFragments["2311"])
-    ImageWidth = len(ImageFragments["2311"][0])
-    
-    for Image in ImageFragments:
-        Sides = []        
-        Sides.append("".join(ImageFragments[Image][0]))
-        Sides.append("".join(ImageFragments[Image][ImageLength-1]))
-        Left = []
-        Right = []
-        for Index in range(ImageLength):
-            Left.append(ImageFragments[Image][Index][0])
-            Right.append(ImageFragments[Image][Index][ImageWidth-1])
-        Sides.append("".join(Left))
-        Sides.append("".join(Right))
-        
-        Borders[Image] = Sides
+    return tuple(''.join(row) for row in out)
 
-    return Borders
-
-def SortPieces(Borders,ImageFragments):
-    Corners = {}
-    Outside = {}
-    Inside = {}
-    Matches = {}
-
-    for Image in Borders:
-
-        Top = Borders[Image][0]
-        Left = Borders[Image][2]
-        Right = Borders[Image][3]
-        Bottom = Borders[Image][1]
-        NumberOfMatches = 0
-        
-        for ComparedImage in Borders:
-
-            if Image == ComparedImage:
-                continue
-
-            for Side in Borders[ComparedImage]:
-                Reversed = Side[::-1]
-
-                if Top == Side:
-                    NumberOfMatches += 1
-                if Top == Reversed:
-                    NumberOfMatches += 1
-                if Bottom == Side:
-                    NumberOfMatches += 1
-                if Bottom == Reversed:
-                    NumberOfMatches += 1
-                if Left == Side:
-                    NumberOfMatches += 1
-                if Left == Reversed:
-                    NumberOfMatches += 1
-                if Right == Side:
-                    NumberOfMatches += 1
-                if Right == Reversed:
-                    NumberOfMatches += 1
-                
-        if NumberOfMatches == 4:
-            Inside[Image] = Borders[Image]
-        if NumberOfMatches == 3:
-            Outside[Image] = Borders[Image]
-        if NumberOfMatches == 2:
-            Corners[Image] = Borders[Image]
-      
-    return Inside, Outside, Corners
-
-def DetermineFragmentLocation(Corners, Inside, Outside, ImageFragments):
-    ImageLength = len(ImageFragments["2311"])
-    ImageWidth = len(ImageFragments["2311"][0])
-    OutsideMatches = {}
-    InsideMatches = {}
-    CornerMatches = {}
-    Grid = {}
-    for Image in Corners:
-        Top = Corners[Image][0]
-        Left = Corners[Image][2]
-        Right = Corners[Image][3]
-        Bottom = Corners[Image][1]
-
-        Data = []
-        for Neighbors in Outside:
-            
-            for Index, Side in enumerate(Outside[Neighbors]):
-                Reversed = Side[::-1]
-                
-                
-                if Top == Side:
-                    Data.append(("Top", Neighbors, Index, False))
-                if Top == Reversed:
-                    Data.append(("Top",Neighbors, Index, True))
-                if Bottom == Side:
-                    Data.append(("Bottom", Neighbors, Index, False))
-                if Bottom == Reversed:
-                    Data.append(("Bottom", Neighbors, Index, True))
-                if Left == Side:
-                    Data.append(("Left", Neighbors, Index, False))
-                if Left == Reversed:
-                    Data.append(("Left",Neighbors, Index, True))
-                if Right == Side:
-                    Data.append(("Right",Neighbors, Index, False))
-                if Right == Reversed:
-                    Data.append(("Right",Neighbors, Index, True))
-            CornerMatches[Image] = Data
-
-    for Image in Outside:
-        Top = Outside[Image][0]
-        Left = Outside[Image][2]
-        Right = Outside[Image][3]
-        Bottom = Outside[Image][1]
-        Data = []
-        for Neighbors in Inside:
-            
-            for Index, Side in enumerate(Inside[Neighbors]):
-                Reversed = Side[::-1]
-                
-                
-                if Top == Side:
-                    Data.append(("Top", Neighbors, Index, False))
-                if Top == Reversed:
-                    Data.append(("Top",Neighbors, Index, True))
-                if Bottom == Side:
-                    Data.append(("Bottom", Neighbors, Index, False))
-                if Bottom == Reversed:
-                    Data.append(("Bottom", Neighbors, Index, True))
-                if Left == Side:
-                    Data.append(("Left", Neighbors, Index, False))
-                if Left == Reversed:
-                    Data.append(("Left",Neighbors, Index, True))
-                if Right == Side:
-                    Data.append(("Right",Neighbors, Index, False))
-                if Right == Reversed:
-                    Data.append(("Right",Neighbors, Index, True))
-            OutsideMatches[Image] = Data
-            
-        for Neighbors in Corners:
-            
-            for Index, Side in enumerate(Corners[Neighbors]):
-                Reversed = Side[::-1]
-                
-                
-                if Top == Side:
-                    Data.append(("Top", Neighbors, Index, False))
-                if Top == Reversed:
-                    Data.append(("Top",Neighbors, Index, True))
-                if Bottom == Side:
-                    Data.append(("Bottom", Neighbors, Index, False))
-                if Bottom == Reversed:
-                    Data.append(("Bottom", Neighbors, Index, True))
-                if Left == Side:
-                    Data.append(("Left", Neighbors, Index, False))
-                if Left == Reversed:
-                    Data.append(("Left",Neighbors, Index, True))
-                if Right == Side:
-                    Data.append(("Right",Neighbors, Index, False))
-                if Right == Reversed:
-                    Data.append(("Right",Neighbors, Index, True))
-            OutsideMatches[Image] = Data
-
-    for Image in Inside:
-        Top = Inside[Image][0]
-        Left = Inside[Image][2]
-        Right = Inside[Image][3]
-        Bottom = Inside[Image][1]
-        Data = []
-        for Neighbors in Outside:
-            
-            for Index, Side in enumerate(Outside[Neighbors]):
-                Reversed = Side[::-1]
-                
-                
-                if Top == Side:
-                    Data.append(("Top", Neighbors, Index, False))
-                if Top == Reversed:
-                    Data.append(("Top",Neighbors, Index, True))
-                if Bottom == Side:
-                    Data.append(("Bottom", Neighbors, Index, False))
-                if Bottom == Reversed:
-                    Data.append(("Bottom", Neighbors, Index, True))
-                if Left == Side:
-                    Data.append(("Left", Neighbors, Index, False))
-                if Left == Reversed:
-                    Data.append(("Left",Neighbors, Index, True))
-                if Right == Side:
-                    Data.append(("Right",Neighbors, Index, False))
-                if Right == Reversed:
-                    Data.append(("Right",Neighbors, Index, True))
-            InsideMatches[Image] = Data
-        
-    return
-
-def MultiplyCorners(Corners):
-    Answer = 1
-    for Key in Corners:
-        Answer *= int(Key)
-        
-    return Answer
+def place(mat, i, j, block):
+    n = len(block)
+    for x in range(n):
+        for y in range(n):
+            mat[i + x][j + y] = block[x][y]
 
 def main():
-    t_start = time()
-    
-    ImageFragments = ReadInFile()
-    Borders = DetermineBorders(ImageFragments)
-    Inside, Outside, Corners = SortPieces(Borders,ImageFragments)
+    File = open("./PuzzleInput.txt", "r")
+    data = File.read().split("\n\n")
+    tiles = []
+    for tile in data:
+        lines = tile.strip().split('\n')
+        tile_id = int(lines[0][-5:-1])
+        grid = tuple(lines[1:])
+        all_rots = []
+        for _ in range(2):
+            for _ in range(4):
+                all_rots.append(grid)
+                grid = rot(grid)
+            grid = flip(grid)
 
-    DetermineFragmentLocation(Corners, Inside, Outside,ImageFragments)
-    Answer = MultiplyCorners(Corners)
+        tiles.append((tile_id, all_rots))
 
-    print("Part 1: ", Answer)
-    
-    elapsed = 1000 * (time() - t_start)
-    print("Time: %.3fms" % elapsed)
-    
+    N = int(math.sqrt(len(tiles)))
+    K = len(tiles[0][1][0])
+    print(N, K, len(tiles))
+    stitched = [[None for _ in range(N * K)] for _ in range(N * K)]
+    ids = [[-1 for _ in range(N)] for _ in range(N)]
+    placed = set()
+
+    def dfs(r, c):
+        if c == N:
+            return dfs(r + 1, 0)
+        if r == N:
+            return True
+
+        valid = False
+        for tile_id, opts in tiles:
+            if tile_id in placed:
+                continue
+
+            placed.add(tile_id)
+            ids[r][c] = tile_id
+            for idx, opt in enumerate(opts):
+                place(stitched, K * r, K * c, opt)
+                can_place = True
+                # some of these str joins are probably no-ops but I've been burned too many times now to check
+                if r > 0:
+                    top = "".join(opt[0])
+                    before = "".join(stitched[K * r - 1][K*c:K*c+K])
+                    can_place &= top == before
+                    # print("top fail", top, before)
+                if c > 0:
+                    left = "".join(row[0] for row in opt)
+                    before = "".join(stitched[row][K * c - 1] for row in range(K * r, K * r + K))
+                    can_place &= left == before
+                    # print("left fail", left, before)
+                if can_place and dfs(r, c + 1):
+                    return True
+
+            placed.remove(tile_id)
+            ids[r][c] = -1
+
+        return False
+    dfs(0, 0)
+    print("part1", ids[0][0] * ids[-1][0] * ids[0][-1] * ids[-1][-1])
+    out = [[]]
+    for i in range(N * K):
+        for j in range(N * K):
+            if i % K in (0, K - 1) or j % K in (0, K - 1):
+                continue
+            if len(out[-1]) == N * (K - 2):
+                out[-1] = "".join(out[-1])
+                out.append([])
+            out[-1].append(stitched[i][j])
+
+    out[-1] = "".join(out[-1])
+    # forgive my sins
+    monster = [(0, 18)] + [(1, 0), (1, 5), (1, 6), (1, 11), (1, 12), (1, 17), (1, 18), (1, 19)] + [(2, 1), (2, 4), (2, 7), (2, 10), (2, 13), (2, 16)]
+    ans = 0
+    for _ in range(2):
+        for _ in range(4):
+            monster_count = 0
+            for i in range(len(out) - 2):
+                for j in range(len(out[0]) - 19):
+                    if all(out[i + dx][j + dy] == '#' for dx, dy in monster):
+                        monster_count += 1
+            ans = max(ans, monster_count)
+            out = rot(out)
+        out = flip(out)
+
+    print("part2", "".join(out).count("#") - ans * len(monster))
+
 if __name__ == "__main__":
     main()
