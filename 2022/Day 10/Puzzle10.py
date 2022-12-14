@@ -25,17 +25,31 @@ def solveA(Steps):
             Register += Step[1]
 
     Total = Tracker[20]*20 + Tracker[60]*60 + Tracker[100]*100 + Tracker[140]*140 + Tracker[180]*180 + Tracker[220]*220
-    return Total
+    return Total, Tracker
 
-def solveB(Input):
+def solveB(Tracker):
+    CRT = []
+    for j in range(6):
+        for i in range(40):
+            Register = Tracker[(i+j*40)+1]
+            Sprite = [Register-1, Register, Register +1]
+
+            if i in Sprite:
+                CRT.append("#")
+            else:
+                CRT.append(".")
+    Row = 0
+    for j in range(6):
+        print("".join(CRT[Row:Row+40]))
+        Row = Row+40
     return
 
 def main():
 
     Input=ReadInputs()
-    Part1=solveA(Input)
+    Part1,Tracker=solveA(Input)
     print("Answer: ", Part1)
-    Part2=solveB(Input)
+    Part2=solveB(Tracker)
     print("Answer: ", Part2)
 
 
