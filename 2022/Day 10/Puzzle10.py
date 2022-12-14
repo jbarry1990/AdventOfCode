@@ -38,11 +38,8 @@ def solveB(Tracker):
                 CRT.append("#")
             else:
                 CRT.append(".")
-    Row = 0
-    for j in range(6):
-        print("".join(CRT[Row:Row+40]))
-        Row = Row+40
-    return
+
+    return CRT
 
 def main():
 
@@ -50,7 +47,10 @@ def main():
     Part1,Tracker=solveA(Input)
     print("Answer: ", Part1)
     Part2=solveB(Tracker)
-    print("Answer: ", Part2)
+    Row = 0
+    for j in range(6):
+        print("".join(Part2[Row:Row+40]))
+        Row = Row+40
 
 
 
