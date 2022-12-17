@@ -28,7 +28,7 @@ def BuildMap(Rocks):
             if y > LowerY:
                 LowerY = y
 
-    Map = [["."  for Row in range(LowerX, UpperX+1)] for Column in range(LowerY+1)]
+    Map = [["."  for Row in range(1000)] for Column in range(LowerY+1)]
 
     for Rock in Rocks:
         for Index, (x,y) in enumerate(Rock):
@@ -39,22 +39,22 @@ def BuildMap(Rocks):
             if x == dx:
                 for yy in range(abs(y-dy)+1):
                     if y < dy:
-                        Map[y+yy][x-LowerX] = "#"
+                        Map[y+yy][x] = "#"
                     else:
-                        Map[dy+yy][x-LowerX] = "#"
+                        Map[dy+yy][x] = "#"
             else:
                 for xx in range(abs(x-dx)+1):
                     if x < dx:
-                        Map[y][x+xx-LowerX] = "#"
+                        Map[y][x+xx] = "#"
                     else:
-                        Map[y][dx+xx-LowerX] = "#"
+                        Map[y][dx+xx] = "#"
 
     return Map, LowerX, UpperX, LowerY
 
 def solveA(Rocks):
     Map, LowerX, UpperX, LowerY = BuildMap(Rocks)
 
-    CurrentColumn = 500-LowerX
+    CurrentColumn = 500
     CurrentRow = 0
     GrainsOfSand = 0
     End = True
@@ -75,20 +75,24 @@ def solveA(Rocks):
         else:
             Map[CurrentRow][CurrentColumn] = "o"
             GrainsOfSand +=1
-            CurrentColumn = 500-LowerX
+            CurrentColumn = 500
             CurrentRow = 0
     return GrainsOfSand
 
 def solveB(Rocks):
     Map, LowerX, UpperX, LowerY = BuildMap(Rocks)
 
-    CurrentColumn = 500-LowerX
+    Map.append(["." for _ in range(1000)])
+    Map.append(["#" for _ in range(1000)])
+
+    CurrentColumn = 500
     CurrentRow = 0
     GrainsOfSand = 0
     End = True
+
     while End:
 
-        if Map[0][500-LowerX] == "o":
+        if Map[0][500] == "o":
             End = False
             continue
 
@@ -103,7 +107,7 @@ def solveB(Rocks):
         else:
             Map[CurrentRow][CurrentColumn] = "o"
             GrainsOfSand +=1
-            CurrentColumn = 500-LowerX
+            CurrentColumn = 500
             CurrentRow = 0
     return GrainsOfSand
 
