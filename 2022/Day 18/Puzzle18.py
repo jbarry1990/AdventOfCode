@@ -37,8 +37,71 @@ def solveA(Coordinates):
         Answer += Value
     return Answer
 
-def solveB(Input):
-    return
+def IsOutside(xIn,yIn,zIn,Coordinates):
+    Seen = set()
+    Queue = []
+    Queue.append([xIn,yIn,zIn])
+    while Queue != []:
+        [x,y,z] = Queue.pop()
+
+        if [x,y,z] in Coordinates:
+            continue
+        
+        if x > max(maxX[0] for maxX in Coordinates):
+            return True
+        if x < min(minX[0] for minX in Coordinates):
+            return True
+        if y > max(maxY[1] for maxY in Coordinates):
+            return True
+        if y < min(minY[1] for minY in Coordinates):
+            return True
+        if z > max(maxZ[2] for maxZ in Coordinates):
+            return True
+        if z < min(minZ[2] for minZ in Coordinates):
+            return True
+        if (x+1,y,z) not in Seen:
+            Queue.insert(0,[x+1,y,z])
+            Seen.add((x+1,y,z))
+        if (x-1,y,z) not in Seen:
+            Queue.insert(0,[x-1,y,z])
+            Seen.add((x-1,y,z))
+        if (x,y+1,z) not in Seen:
+            Queue.insert(0,[x,y+1,z])
+            Seen.add((x,y+1,z))
+        if (x,y-1,z) not in Seen:
+            Queue.insert(0,[x,y-1,z])
+            Seen.add((x,y-1,z))
+        if (x,y,z+1) not in Seen:
+            Queue.insert(0,[x,y,z+1])
+            Seen.add((x,y,z+1))
+        if (x,y,z-1) not in Seen:
+            Queue.insert(0,[x,y,z-1])
+            Seen.add((x,y,z-1))
+    return False
+
+def solveB(Coordinates):
+    Answer = 0
+    MaxX = max(x[0] for x in Coordinates)
+    MaxY = max(y[1] for y in Coordinates)
+    MaxZ = max(z[2] for z in Coordinates)
+    MinX = min(x[0] for x in Coordinates)
+    MinY = min(y[1] for y in Coordinates)
+    MinZ = min(z[2] for z in Coordinates)
+    for x,y,z in Coordinates:
+        if IsOutside(x+1,y,z,Coordinates):
+            Answer +=1
+        if IsOutside(x-1,y,z,Coordinates):
+            Answer +=1
+        if IsOutside(x,y+1,z,Coordinates):
+            Answer +=1
+        if IsOutside(x,y-1,z,Coordinates):
+            Answer +=1
+        if IsOutside(x,y,z+1,Coordinates):
+            Answer +=1
+        if IsOutside(x+1,y,z-1,Coordinates):
+            Answer +=1
+        print(Answer)
+    return Answer
 
 def main():
 
