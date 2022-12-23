@@ -5,14 +5,16 @@ def ReadInputs():
         Data = File.read().strip()
         Solved = {}
         Equations = {}
+        Lines = []
         for Line in Data.split("\n"):
+            Lines.append(Line)
             Words = Line.split()
             if len(Words) == 2:
                 Solved[Words[0][:-1]] = int(Words[1])
             else:
                 Equations[Words[0][:-1]] = " ".join(Words[1:])
 
-        return Solved, Equations
+        return Solved, Equations, Lines
 
 
     
@@ -33,11 +35,11 @@ def solveA(Solved, Equations):
     
     return int(Solved["root"])
 
-def solveB(Solved, Equations):
+def solveB(Solved, Equations, Lines):
     Answer = 0
     monkeys = { "humn": sympy.Symbol("x") }
 
-    x = [line.strip() for line in open(0)]
+    x = [line.strip() for line in Lines]
 
     ops = {
         "+": lambda x, y: x + y,
@@ -64,11 +66,11 @@ def solveB(Solved, Equations):
 
 def main():
 
-    Solved, Equations=ReadInputs()
+    Solved, Equations,Lines=ReadInputs()
     Part1=solveA(Solved, Equations)
     print("Answer: ", Part1)
-    Solved, Equations=ReadInputs()
-    Part2=solveB(Solved,Equations)
+    Solved, Equations, Lines=ReadInputs()
+    Part2=solveB(Solved,Equations, Lines)
     print("Answer: ", Part2)
 
 
