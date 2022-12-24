@@ -36,25 +36,19 @@ def solveA(Map,Directions):
     CurrentPosition = (0,StartingColumn)
     for Step in Directions:
         if Step.isdigit():
-            print("CurrentPosition: ", CurrentPosition)
-            row,col = CurrentPosition
-            drow, dcol = CurrentHeading
             for i in range(1,int(Step)+1):
+                row,col = CurrentPosition
+                drow, dcol = CurrentHeading
                 new_col = col + (dcol)
                 new_row = row + (drow)
 
                 if new_col < 0 or new_col >= MapWidth:
-                    #print("End of Row")
                     wrapped_col = new_col%MapWidth
                     if Map[new_row][wrapped_col] == "#":
                         CurrentPosition = (row,col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
                         break
                     if Map[new_row][wrapped_col] == ".":
                         CurrentPosition = (new_row, wrapped_col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
                     else:
                         map_row = [Map[new_row][x] for x in range(MapWidth)]
                         map_row = "".join(x for x in map_row)
@@ -63,21 +57,14 @@ def solveA(Map,Directions):
                         else:
                             new_col = map_row.rfind(".")
                         CurrentPosition = (new_row, new_col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
 
                 elif new_row < 0 or new_row >= MapHeight:
-                    #print("End of Column")
                     wrapped_row = new_row%MapHeight
                     if Map[wrapped_row][new_col] == "#":
                         CurrentPosition = (row,col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
                         break
                     if wrapped_row == ".":
                         CurrentPosition = (wrapped_row, new_col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
                     else:
                         map_col = [Map[x][new_col] for x in range(MapHeight)]
                         map_col = "".join(x for x in map_col)
@@ -86,41 +73,50 @@ def solveA(Map,Directions):
                         else:
                             new_row = map_col.rfind(".")
                         CurrentPosition = (new_row, new_col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
 
-                elif Map[row+(drow)][col+(dcol)] == " ":
-                    #print("End of Dots")
+                elif Map[new_row][new_col] == " ":
+                    # The heading is either up or down
                     if dcol == 0:
                         map_col = [Map[x][new_col] for x in range(MapHeight)]
                         map_col = "".join(x for x in map_col)
+                        #The heading is down
                         if drow == 1:
-                            new_row = map_col.find(".")
+                            if map_col.strip()[0] == "#":
+                                CurrentPosition = (row,col)
+                                break
+                            new_row = map_col.find(".") 
+                        # The heading is up
                         else:
+                            if map_col.strip()[-1] == "#":
+                                CurrentPosition = (row,col)
+                                break
                             new_row = map_col.rfind(".")
                         CurrentPosition = (new_row, new_col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
+
+                    # The heading is either left or right
                     else:
                         map_row = [Map[new_row][x] for x in range(MapWidth)]
                         map_row = "".join(x for x in map_row)
+
+                        # The heading is right
                         if dcol == 1:
+                            if map_row[0] == "#":
+                                CurrentPosition = (row,col)
+                                break
                             new_col = map_row.find(".")
+                        # The heading is left
                         else:
+                            if map_row[-1] == "#":
+                                CurrentPosition = (row,col)
+                                break
                             new_col = map_row.rfind(".")
                         CurrentPosition = (new_row, new_col)
-                        #print("Current Position: ",CurrentPosition)
-                        #print("Current Heading: ", CurrentHeading)
-                elif Map[row+(drow)][col+(dcol)] == "#":
-                    #print("Hit a wall")
+                elif Map[new_row][new_col] == "#":
                     CurrentPosition = (row, col)
-                    #print("Current Position: ",CurrentPosition)
-                    #print("Current Heading: ", CurrentHeading)
                     break
                 else:
                     CurrentPosition = (new_row, new_col)
-                    #print("Current Position: ",CurrentPosition)
-                    #print("Current Heading: ", CurrentHeading)
+
         elif Step == "R":
             if CurrentHeading == (0,1):
                 CurrentHeading = (1,0)
@@ -140,7 +136,20 @@ def solveA(Map,Directions):
             elif CurrentHeading == (1,0):
                 CurrentHeading = (0,1)
 
-    return CurrentPosition
+    x,y = CurrentPosition
+    x +=1
+    y +=1
+    heading_score = -1
+    if CurrentHeading == (0,1):
+        heading_score = 0
+    elif CurrentHeading == (0,-1):
+        heading_score = 2
+    elif CurrentHeading == (-1,0):
+        heading_score = 3
+    elif CurrentHeading == (1,0):
+        heading_score = 1
+
+    return 1000*x + 4*y + heading_score
 
 def solveB(Map,Directions):
     return
