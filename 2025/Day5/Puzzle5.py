@@ -27,10 +27,6 @@ def solveB(Input):
     ranges = Input[0]
 
     ranges.sort(key=lambda x:x[0])
-    print(ranges[-5:])
-    for r in range(10):
-        print(ranges[r])
-    print()
     combined = []
     current_low = ranges[0][0]
     current_high = ranges[0][1]
@@ -41,16 +37,16 @@ def solveB(Input):
             else:
                 combined.append([current_low,high])
             break
-        if ranges[x+1][0] - high <=1:
+        if ranges[x+1][0] - high <=1 or current_high == ranges[x+1][0]:
             current_high = max(ranges[x+1][1], current_high)
         else:
             combined.append([current_low, current_high])
             current_low = ranges[x+1][0]
             current_high = ranges[x+1][1]
-    print(combined[-1])
     total = 0
     for low,high in combined:
         total += (high-low)+1
+
 
     return total     
     
