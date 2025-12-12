@@ -20,19 +20,42 @@ def ReadInputs():
     return machines
 
 def solveA(Input):
+    press_nums = []
     for machine in Input.items():
         goal = machine[1]["lights"]
         lights = ["." for _ in range(len(goal))]
         buttons = machine[1]["buttons"]
-        #print(buttons)
-
-        queue = deque([[lights,buttons,[buttons[0]]]])
-
+        queue = deque([])
+        for b in buttons:
+            queue.append((lights,buttons,[b]))
+        seen = set()
         while len(queue) != 0:
-            print(queue.popleft())
-            break
+
+            (l,b,attempts) = queue.popleft()
+            l = l.copy()
+            b= b.copy()
+            attempts = attempts.copy()
+
+            seen.add(("".join(l),b.index(attempts[-1])))
+
+            for i in attempts[-1]:
+                if l[i] == "#":
+                    l[i] = "."
+                else:
+                    l[i] = "#"
+               
+            if l == goal:
+                press_nums.append(len(attempts))
+                break
+
+            for i in b:
+                temp = attempts.copy()
+                if i != attempts[-1] and ("".join(l),b.index(i)) not in seen:
+                    temp.append(i)
+                    queue.append((l,b,temp))
+
                       
-    return
+    return sum(press_nums)
                 
 def solveB(Input):
     return
