@@ -1,4 +1,4 @@
-import shapely
+from collections import deque
 def ReadInputs():
     File = open("./Inputs.txt", "r")
     Lines = File.readlines()
@@ -20,6 +20,18 @@ def ReadInputs():
     return machines
 
 def solveA(Input):
+    for machine in Input.items():
+        goal = machine[1]["lights"]
+        lights = ["." for _ in range(len(goal))]
+        buttons = machine[1]["buttons"]
+        #print(buttons)
+
+        queue = deque([[lights,buttons,[buttons[0]]]])
+
+        while len(queue) != 0:
+            print(queue.popleft())
+            break
+                      
     return
                 
 def solveB(Input):
