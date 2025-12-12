@@ -1,4 +1,5 @@
 from collections import deque
+import z3
 def ReadInputs():
     File = open("./Inputs.txt", "r")
     Lines = File.readlines()
@@ -58,7 +59,27 @@ def solveA(Input):
     return sum(press_nums)
                 
 def solveB(Input):
-    return
+    num_presses = []
+    for machine in Input.items():
+        joltages = machine[1]["power"]
+        buttons = machine[1]["buttons"]
+
+        o = z3.Optimize()
+        vars = z3.Ints(f"n{i}" for i in range(len(buttons)))
+        for var in vars:
+            o.add(var >= 0)
+        for i,joltage in enumerate(joltages):
+            equation = 0
+            for j,button in enumerate(buttons):
+                if i in button:
+                    equation += vars[j]
+            o.add(equation == joltage)
+        o.minimize(sum(vars))
+        o.check()
+        num_presses.append(o.model().eval(sum(vars)).as_long())
+
+    return sum(num_presses)
+
 
 def main():
 
